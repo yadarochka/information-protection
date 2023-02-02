@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шифрование и дешифрование методом Цезаря</title>
+    <style>
+        body, textarea, button{
+            font-size: 20px;
+        }
+        #root{
+            width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .column{
+            display: flex;
+            flex-direction: column;
+            gap:10px;
+        }
+        .green{
+            padding: 5px 10px;
+            border-radius: 10px;
+            background-color: rgba(172, 255, 47, 0.637);
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <h1>Шифрование и дешифрование методом Цезаря</h1>
+        <span>Сдвиг:</span>
+        <select name="" id="select">
+        </select>
+        <div class="column">
+            <textarea placeholder="Зашифровать" name="" id="onShifr" cols="30" rows="10"></textarea>
+            <div class="row">
+                <button id="onShifrButton">Зашифровать</button>
+                <button id="onShifrCopy">Копировать</button>
+                <span id="result"></span>
+            </div>
+        </div>
+        <div class="column">
+            <textarea placeholder="Расшифровать" name="" id="unShifr" cols="30" rows="10"></textarea>
+            <div class="row">
+                <button id="unShifrButton">Расшифровать</button>
+                <button id="unShifrCopy">Копировать</button>
+                <span id="decrypt-result"></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", ()=>{
+            const select = document.getElementById('select')
+
+            const onShifr = document.getElementById('onShifr')
+            const onShifrButton = document.getElementById('onShifrButton')
+            const onShifrCopy = document.getElementById('onShifrCopy')
+
+            const unShifr = document.getElementById('unShifr')
+            const unShifrButton = document.getElementById('unShifrButton')
+            const unShifrCopy = document.getElementById('unShifrCopy')
+
+            const result = document.getElementById('result');
+            const decResult = document.getElementById('decrypt-result');
+
+            let alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+
+            onShifrCopy.addEventListener('click', ()=>{
+                if (!result.innerHTML){
+                    return
+                }
+                navigator.clipboard.writeText(result.innerHTML.trim())
+                .then(() => {
+                    console.log('success')
+                })
+                .catch(err => {
+                    console.log('Something went wrong', err);
+                });
+            })
+
+            for (let i = 1; i <33; i++){
+                const option = document.createElement('option')
+                option.value = i;
+                option.text = i;
+                select.appendChild(option)
+            }
+            
+            onShifr.addEventListener('input', (e)=>{
+                e.target.value = e.target.value.replace(/[^а-я ]+/,'').toLowerCase() // 
+            })
+
+            onShifrButton.addEventListener('click', function() {
+                if (onShifr.value === ''){
+                    return
+                }
+                encrypt(select.selectedIndex + 1)
+            })
+
+            unShifrButton.addEventListener('click', function() {
+                if (unShifr.value === ''){
+                    return
+                }
+                decrypt(select.selectedIndex + 1)
+            })
+
+
+            function shiftAlphabet(shift) {
+                var shiftedAlphabet = ''; 
+                for (var i = 0; i < alphabet.length; i++) {
+                    currentLetter = (alphabet[i + shift] === undefined) ? (alphabet[i + shift - alphabet.length]) : (alphabet[i + shift]); 
+
+                    shiftedAlphabet = shiftedAlphabet.concat(currentLetter);
+                }
+                return shiftedAlphabet;
+            }
+
+            function encrypt() {
+                const message = onShifr.value
+                let shiftedAlphabet = shiftAlphabet(select.selectedIndex + 1);
+                let encryptedMessage = '';
+                for (var i = 0; i < message.length; i++) {
+                    if(message[i] === ' '){
+                        encryptedMessage += ' '
+                        continue
+                    } 
+                    var indexOfLetter = alphabet.indexOf(message[i]);
+                    encryptedMessage = encryptedMessage.concat(shiftedAlphabet[indexOfLetter]);
+                }
+                result.innerHTML = encryptedMessage.toLowerCase();
+                result.classList.add('green')
+            }
+
+            function decrypt() {
+                const message = unShifr.value
+                console.log(message)
+                var shiftedAlphabet = shiftAlphabet(select.selectedIndex + 1);
+                console.log(shiftedAlphabet)
+                var encryptedMessage = '';
+                for (var i = 0; i < message.length; i++) {
+                    if (message[i] == ' ') {
+                        encryptedMessage = encryptedMessage.concat(' ');
+                        continue
+                    };
+                    var indexOfLetter = shiftedAlphabet.indexOf(message[i]);
+                    var encryptedLetter = alphabet[indexOfLetter];
+                    if(encryptedLetter === undefined){
+                        encryptedMessage = encryptedMessage.concat(message[i]);
+                    }
+                    else{
+                        encryptedMessage = encryptedMessage.concat(alphabet[indexOfLetter]);
+                    }
+                    console.log(encryptedMessage)
+                }
+                decResult.innerHTML = encryptedMessage.toLowerCase();
+                decResult.classList.add('green')
+    }
+
+            
+
+        })
+    </script>
+</body>
+</html>
