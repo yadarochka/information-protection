@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Защита информации</title>
+    <style>
+        body{
+            
+            display: flex;
+            flex-direction: column;
+        }
+
+        #root{
+            display: flex;
+            flex-direction: column;
+            gap:15px;
+            margin: 0 auto;
+            
+        }
+
+        textarea{
+            font-size: 20px;
+        }
+
+        button{
+            font-size: 20px;
+            border: none;
+            outline: none;
+            padding: 0;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all linear .5s;
+            border: 1px solid black;
+            border-radius: 10px;
+            padding: 5px 10px;
+            background-color: rgb(195, 238, 132);
+        }
+        #Clear{
+            background-color: rgba(234, 80, 93, 0.588);
+        }
+
+        .nav{
+            display: flex;
+            gap: 15px;
+        }
+
+        .active{
+            color: rgba(241, 108, 108, 0.723)
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <h1>Распределение частот для генератора чисел на JavaScript</h1>
+        <div class="nav">
+            <button id="Random">Random</button>
+            <button id="Clear">Clear</button>
+            <select name="" id="">
+                <option checked id="PI" value="PI">PI</option>
+                <option id="E" value="E">E</option>
+            </select>
+            
+        </div>
+        <textarea id="textarea" placeholder="Здесь смотрим случайные числа и частоты двух интервалов" cols="110" rows="10"></textarea>
+    </div>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", ()=> {
+
+        const buttonRandom = document.getElementById('Random')
+        const buttonClear = document.getElementById('Clear')
+        const textArea = document.getElementById('textarea')
+
+        buttonRandom.addEventListener('click', ()=>
+            {
+                const mathConst = document.getElementById('PI').selected ? Math.PI : Math.E
+                var Min=10000000;
+                var Max=0;
+                dd = new Date();
+                var dux1=(dd.getSeconds()+1)/100;//0-59
+                const start = dux1
+                let first = 0
+                let second = 0
+                let third = 0
+                let four = 0
+                for (i=1;i<100;i++)
+                {
+                let dux2=(11*dux1+mathConst)-parseInt(11*dux1+mathConst);
+                dux1=dux2;
+                let dux=dux1.toFixed(3)*1;
+                if (dux>Max)
+                {Max=dux;}
+                if (dux<Min)
+                {Min=dux;}
+                if (dux < 0.25){
+                    first++
+                }
+                else if (dux < 0.5 && dux > 0.25){
+                    second++
+                }
+                else if (dux > 0.5 && dux < 0.75){
+                    third++
+                }
+                else if (dux > 0.75){
+                    four++
+                }
+                
+            }
+                const str = `Start=${start} Min=${Min} Max=${Max} First=${first} Second=${second} Third=${third} Fourth=${four}`
+                textArea.innerHTML += str + "\n"
+            })
+            buttonClear.addEventListener('click', ()=>{
+                textArea.innerHTML = ''
+            })
+            })
+    </script>
+</body>
+</html>
