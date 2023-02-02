@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шифр Вермана</title>
+</head>
+<style>
+    h1,h2,h3{
+        margin: 0;
+    }
+    li, textarea, button, span{
+        font-size: 20px;
+    }
+    th{
+        text-align: start;
+    }
+    thead, tbody, td, th{
+        outline: 1px solid black;
+        padding: 5px;
+    }
+    #root{
+        display: flex;
+        flex-direction: column;
+        width: 1000px;
+        margin: 0 auto;
+        gap:20px;
+    }
+    .column{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1 1 auto;
+    }
+    .row{
+        display: flex;
+        gap: 10px;
+    }
+    #history{
+        height: 330px;
+        width: 340px;
+        overflow-y: scroll;
+    }
+    #encode{
+        width: 340px;
+    }
+    .green{
+        padding: 5px 10px;
+        border-radius: 10px;
+        background-color: rgba(201, 253, 123, 0.795);
+    }
+</style>
+<body>
+    <div id="root">
+        <h1>Шифр Вермана</h1>
+        <div class="column">
+            <h2>Принцип работы шифра Вернама</h2>
+        <ol>
+            <li>Нам нужно исходное сообщение и ключ шифрования. Ключ должен быть таким же по размеру, как исходное сообщение, или больше. </li>
+            <li>Каждый бит исходного сообщения сопоставляется с битом ключа шифрования. Производится специальная операция XOR, которая отвечает за кодирование</li>
+            <li>На выходе получается зашифрованный текст, расшифровать который можно только имея под рукой секретный ключ. </li>
+        </ol>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h2>Зашифровать текст</h2>
+                <textarea id="encryptTA" placeholder="Введите текст" name="" cols="30" rows="5"></textarea>
+                <textarea id="encryptKey" placeholder="Введите ключ (если оставить пустым, он будет сгенерирован случайным образом)" name="" cols="30" rows="5"></textarea>
+                <button id="encryptButton">Зашифровать</button>
+            </div>
+            <div id="history" class="column">
+                <h2>История шифров</h2>
+                <span id="initialState">Пусто...</span>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div  class="column">
+                <h2>Расшифровать текст</h2>
+                <textarea id="decryptTA" placeholder="Введите текст" name="" cols="30" rows="5"></textarea>
+                <textarea id="decryptKey" placeholder="Введите ключ" name="" cols="30" rows="5"></textarea>
+                <button id="decryptButton">Расшифровать</button>
+            </div>
+            <div class="column" id="encode">
+                <h2>Расшифровка</h2>
+                <span id="result"></span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // генератор случайных чисел в заданном диапазоне
+        function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+        }
+        let fistTime = true;
+        const history = document.getElementById('history')
+        const resultSpan = document.getElementById('result')
+
+        const encryptTA = document.getElementById('encryptTA')
+        const encryptButton = document.getElementById('encryptButton')
+        const encryptKey = document.getElementById('encryptKey')
+        
+        const decryptTA = document.getElementById('decryptTA')
+        const decryptButton = document.getElementById('decryptButton')
+        const decryptKey = document.getElementById('decryptKey')
+
+        encryptButton.addEventListener('click', () => {
+            
+            const input = encryptTA.value
+            let key = encryptKey.value
+            if (!input){
+                return
+            }
+            if (key.length < input.length) {
+                if (key.length !== 0){
+                    alert("Ключ короче сообщения, это небезопасно. Он будет сгенерирован случайно.");
+                }
+                key = "";
+                for (var i = 0; i < input.length; i++) {
+                    key += String.fromCharCode(getRandomInt(0,66535));
+                }
+            
+            }
+
+            output = "";
+            for (i = 0; i < input.length; i++) {
+
+                // берём цифровое значение очередного символа в сообщении и ключе
+                inp = input.charCodeAt(i);
+                k = key.charCodeAt(i);
+                // и применяем к ним исключающее или — XOR
+                output += String.fromCharCode(inp ^ k); 
+            }
+            console.log(output)
+            if (!fistTime){
+                console.log('!first time')
+                const tbody = document.getElementsByTagName('tbody')[0]
+                const tr = document.createElement('tr');
+                tr.innerHTML +=(`<td>${output}</td>
+                            <td>${key}</td>`)
+                            console.log(tbody)
+                tbody.append(tr)
+            }
+            if (fistTime){
+                console.log('first time')
+                let initialState = document.getElementById('initialState')
+                let table = document.createElement('table');
+                table.innerHTML +=`<thead>
+                    <tr>
+                        <th>Текст сообщения</th>
+                        <th>Ключ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${output}</td>
+                        <td>${key}</td>
+                    </tr>
+                </tbody>`
+                history.append(table) 
+                initialState.remove()
+                fistTime = false
+            }
+            
+        })
+
+            
+
+        decryptButton.addEventListener('click', () => {
+            const input = decryptTA.value
+            let key = decryptKey.value
+            if (!input){
+                return
+            }
+            result = ''
+            for (i = 0; i < output.length; i++) {
+
+                // берём цифровое значение очередного символа в сообщении и ключе
+                inp = output.charCodeAt(i);
+                k = key.charCodeAt(i);
+                // и применяем к ним исключающее или — XOR
+                result += String.fromCharCode(inp ^ k); 
+            }
+            resultSpan.innerHTML = result
+            resultSpan.classList.add('green')
+        })
+
+    </script>
+</body>
+</html>
